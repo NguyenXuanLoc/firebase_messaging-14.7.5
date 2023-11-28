@@ -416,7 +416,7 @@ public class FlutterFirebaseMessagingPlugin
 
   @Override
   public void onMethodCall(final MethodCall call, @NonNull final Result result) {
-    Task<?> methodCallTask;
+    Task<?> methodCallTask = null;
 
     switch (call.method) {
       // This message is sent when the Dart side of this plugin is told to initialize.
@@ -468,6 +468,14 @@ public class FlutterFirebaseMessagingPlugin
                 pluginCallbackHandle, shellArgs);
         methodCallTask = Tasks.forResult(null);
         break;
+      case "PayLoad":
+        Intent intent = mainActivity.getIntent();
+        Object payload = intent.getExtras().get("payload");
+        if (payload !=null) {
+//          Log.d("TAG onMethodCall", "onMethodCall: PAY LOAD" + payload.toString());
+          result.success(payload.toString());
+        }else  result.success("");
+        break;
       case "Messaging#getInitialMessage":
         methodCallTask = getInitialMessage();
         break;
@@ -509,18 +517,21 @@ public class FlutterFirebaseMessagingPlugin
         return;
     }
 
-    methodCallTask.addOnCompleteListener(
-            task -> {
-              if (task.isSuccessful()) {
-                result.success(task.getResult());
-              } else {
-                Exception exception = task.getException();
-                result.error(
-                        "firebase_messaging",
-                        exception != null ? exception.getMessage() : null,
-                        getExceptionDetails(exception));
-              }
-            });
+    try{
+      if(methodCallTask!=null)
+        methodCallTask.addOnCompleteListener(
+                task -> {
+                  if (task.isSuccessful()) {
+                    result.success(task.getResult());
+                  } else {
+                    Exception exception = task.getException();
+                    result.error(
+                            "firebase_messaging",
+                            exception != null ? exception.getMessage() : null,
+                            getExceptionDetails(exception));
+                  }
+                });
+    }catch (Exception e){}
   }
 
   private Map<String, Object> getExceptionDetails(@Nullable Exception exception) {
