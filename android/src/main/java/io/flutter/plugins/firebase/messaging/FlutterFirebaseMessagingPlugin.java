@@ -472,7 +472,7 @@ public class FlutterFirebaseMessagingPlugin
         Intent intent = mainActivity.getIntent();
         Object payload = intent.getExtras().get("payload");
         if (payload !=null) {
-//          Log.d("TAG onMethodCall", "onMethodCall: PAY LOAD" + payload.toString());
+          Log.d("TAG onMethodCall", "onMethodCall: PAY LOAD" + payload.toString());
           result.success(payload.toString());
         }else  result.success("");
         break;
